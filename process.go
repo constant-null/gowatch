@@ -6,14 +6,14 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Program controls execution of several goroutines
-type Program struct {
+// Process controls execution of several goroutines
+type Process struct {
 	mu     sync.Mutex
 	errors chan error
 }
 
 // Run starts new process as a goroutine
-func (p *Program) Run(proc func()) {
+func (p *Process) Run(proc func()) {
 	p.runE(func() error {
 		proc()
 
@@ -22,20 +22,20 @@ func (p *Program) Run(proc func()) {
 }
 
 // RunE starts new process as a goroutine and watch for errors
-func (p *Program) RunE(proc func() error) {
+func (p *Process) RunE(proc func() error) {
 	go p.runE(proc)
 }
 
 // Watch start watching for started goroutines
 // returns when one of goroutines stopped, if goroutine exited with error
 // error is returned
-func (p *Program) Watch() error {
+func (p *Process) Watch() error {
 	p.initErrCh()
 
 	return p.waitForErr()
 }
 
-func (p *Program) runE(proc func() error) {
+func (p *Process) runE(proc func() error) {
 	defer func() {
 		if err := recover(); err != nil {
 			p.watchErr(errors.Errorf("panic: %v", err))
@@ -45,13 +45,13 @@ func (p *Program) runE(proc func() error) {
 	p.watchErr(proc())
 }
 
-func (p *Program) watchErr(err error) {
+func (p *Process) watchErr(err error) {
 	p.initErrCh()
 
 	p.errors <- err
 }
 
-func (p *Program) initErrCh() {
+func (p *Process) initErrCh() {
 	p.mu.Lock()
 	if p.errors == nil {
 		p.errors = make(chan error, 1)
@@ -59,7 +59,7 @@ func (p *Program) initErrCh() {
 	p.mu.Unlock()
 }
 
-func (p *Program) waitForErr() error {
+func (p *Process) waitForErr() error {
 	p.initErrCh()
 	return <-p.errors
 }

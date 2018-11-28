@@ -11,7 +11,7 @@ import (
 var errTestTimeout = errors.New("test timeout")
 
 func TestProgram_RunE(t *testing.T) {
-	var p Program
+	var p Process
 	var errExpected = errors.New("expected error")
 
 	p.RunE(func() error {
@@ -30,7 +30,7 @@ func TestProgram_RunE(t *testing.T) {
 }
 
 func TestProgram_RunPanic(t *testing.T) {
-	var p Program
+	var p Process
 	var errExpected = errors.New("expected error")
 
 	p.RunE(func() error {
@@ -49,7 +49,7 @@ func TestProgram_RunPanic(t *testing.T) {
 }
 
 func TestProgram_RunNilError(t *testing.T) {
-	var p Program
+	var p Process
 	var errExpected error
 
 	p.RunE(func() error {
