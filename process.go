@@ -14,7 +14,7 @@ type Process struct {
 
 // Run starts new process as a goroutine
 func (p *Process) Run(proc func()) {
-	p.runE(func() error {
+	go p.runE(func() error {
 		proc()
 
 		return nil
